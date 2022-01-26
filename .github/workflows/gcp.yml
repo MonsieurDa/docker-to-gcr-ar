@@ -26,16 +26,16 @@ jobs:
       run: docker build -t $IMAGE_NAME:latest .
 
     # automating tags
-    - name: Automatic Tagging of Releases
-      id: increment-git-tag
-      run: |
-        bash ./scripts/git_update.sh -v major
+    #- name: Automatic Tagging of Releases
+    #  id: increment-git-tag
+    #  run: |
+    #    bash ./scripts/git_update.sh -v major
 
     # configure docker to use gcp to auth 
     - name: Configure Docker Client
       run: |-
         gcloud auth configure-docker --quiet
-        gcloud auth configure-docker us-west2-docker.pkg.dev --quiet
+        #gcloud auth configure-docker us-west2-docker.pkg.dev --quiet
       
     # push to gcr
     - name: Push Docker Image to Container Registry (GCR)
