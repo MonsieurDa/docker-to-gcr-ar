@@ -26,10 +26,10 @@ jobs:
       run: docker build -t $IMAGE_NAME:latest .
 
     # automating tags
-    #- name: Automatic Tagging of Releases
-    #  id: increment-git-tag
-    #  run: |
-    #    bash ./scripts/git_update.sh -v major
+    - name: Automatic Tagging of Releases
+      id: increment-git-tag
+      run: |
+        bash ./scripts/git_update.sh -v major
 
     # configure docker to use gcp to auth 
     - name: Configure Docker Client
@@ -42,8 +42,9 @@ jobs:
     # push to gcr
     - name: Push Docker Image to Container Registry (GCR)
       env:
-        #${{ steps.increment-git-tag.outputs.git-tag }}
-        GIT_TAG: v0.1.0
+        #GIT_TAG: v0.1.0
+        GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+
       run: |-
         docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
         docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
@@ -53,8 +54,8 @@ jobs:
     # push to ar
     - name: Push Docker Image to Artifact Registry
       env:
-        #${{ steps.increment-git-tag.outputs.git-tag }}
-        GIT_TAG: v0.1.0
+        GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        #GIT_TAG: v0.1.0
       run: |-
         docker tag $IMAGE_NAME:latest us-west2-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
         docker tag $IMAGE_NAME:latest us-west2-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
