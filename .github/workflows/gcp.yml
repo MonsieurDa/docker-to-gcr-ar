@@ -2,7 +2,7 @@
 name: Build and Push Python Image to Google Cloud Platform
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 jobs:
   build-push-gcr:
     name: Build and Push to GCP
@@ -26,16 +26,18 @@ jobs:
       run: docker build -t $IMAGE_NAME:latest .
 
     # automating tags
-    - name: Automatic Tagging of Releases
-      id: increment-git-tag
-      run: |
-        bash ./scripts/git_update.sh -v major
+    #- name: Automatic Tagging of Releases
+    #  id: increment-git-tag
+    #  run: |
+    #    bash ./scripts/git_update.sh -v major
 
     # configure docker to use gcp to auth 
     - name: Configure Docker Client
       run: |-
         gcloud auth configure-docker --quiet
-        gcloud auth configure-docker us-west2-docker.pkg.dev --quiet
+        # plaste instructions here
+        gcloud auth configure-docker \
+        us-west2-docker.pkg.dev
       
     # push to gcr
     - name: Push Docker Image to Container Registry (GCR)
@@ -51,7 +53,8 @@ jobs:
     # push to ar
     - name: Push Docker Image to Artifact Registry
       env:
-        GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        #${{ steps.increment-git-tag.outputs.git-tag }}
+        GIT_TAG: v0.1.0
       run: |-
         docker tag $IMAGE_NAME:latest us-west2-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
         docker tag $IMAGE_NAME:latest us-west2-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
